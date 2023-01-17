@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Traveller's weather guide</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+
+    <body>
+        
+        <script type="module">
+            import {createApp} from 'https://unpkg.com/vue@3/dist/vue.esm-browser.js'
+            createApp({
+                data() {
+                    return {
+                    city : '',
+                    packing : false,
+                    weatherType : '',
+                    table : [],
+                    wearMask : false,
+                    showResponse : false,
+                    imgUrl : ''
+                    }  
+                },
+                methods : {
+                    getWeather : getWeatherData
+                }
+            }).mount('#app')
+
+            // Callback method which executes when the user clicks the Check Weather button
+            function getWeatherData(){
+                let prom = fetch('/api/cityWeather/'+this.city);
+                prom.then(response => response.json())
+                    .then(response =>
+                    {
+                        this.packing = response.pack_umbrella;
+                        this.weatherType = response.weather;
+                        this.table = response.daily;
+                        this.wearMask = response.wear_mask;
+                        this.showResponse = true;
+                        this.imgUrl = response.img_url;
+                    }
+                    )
+                    .catch((err) => {
+                        console.log(err);
+                    });
+            }
+        </script>
+        <div id="app">
+            <h1>Welcome to the weather guide for your travel plans</h1>
+            <p>Please enter the city you wish to travel to</p>
+            <input type="text" v-model="city">
+            <button v-on:click="getWeather">Check Weather</button>
+
+            <br>
+            <div v-if="showResponse">
+                <div v-if="packing"><strong>There's going to be 🌧️, pack an ☂️!</strong></div>
+                <div v-else><strong>No need to pack an ☂️, enjoy the 🌞!</strong></div>
+                <div v-if="weatherType === 'cold'"><em>It's going to be ❄️, pack your jackets!</em></div>
+                <div v-else-if="weatherType === 'mild'"><em>Mild weather expected, just as it should be!</em></div>
+                <div v-else-if="weatherType === 'hot'"><em>It's going to be ♨️, pack light clothes!</em></div>
+                <br>
+                <h2>Weather forecast for next 4 days for your destination</h2>
+                <ul>
+                    <li v-for="item of table">
+                        <p>
+                            Wind Speed: {{item.wind_speed}} m/s
+                        </p>
+                        <p> 
+                            Day Temperature: {{item.temp}} C
+                        </p>
+                        <p>
+                            Rainfall Level: {{item.rain}} mm
+                        </p>
+                    </li>
+                </ul>
+                <div v-if="wearMask"><em>Air pollution is expected to be high, you would need a 😷!</em></div>
+                <div v-else><em>The air is expected to be clear, no need to carry a 😷!</em></div>
+                <br>
+                <h3>Here's a picture of the city you are going to</h3>
+                <img v-bind:src="imgUrl" alt="City Image">
+            </div>
+        </div>
+    </body>
+</html>
