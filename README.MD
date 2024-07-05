@@ -16,4 +16,4 @@ This is a simple Internet Application that inputs the city that someone is plann
 
 ## Innovative feature
 
-Whenever the user inputs any city's name, the picture associated with the city is also diplayed along with the information on the weather of that city. The picture is fetched using Unsplash API on the server.
+Whenever the user inputs any city's name, the picture associated with the city is also displayed along with the information on the weather of that city. The picture is fetched using Unsplash API on the server.
